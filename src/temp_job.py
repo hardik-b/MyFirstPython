@@ -54,9 +54,9 @@ job.init(args["JOB_NAME"], args)
 # Script generated for node Oracle SQL table
 # OracleSQLtable_node1 = directJDBCSource(
     # glueContext,
-    # connectionName="test-cr5505-vots-db",
+    # connectionName="test-cr5505-app-db",
     # connectionType="oracle",
-    # database="votsdev",
+    # database="appdev",
     # table="",
     # redshiftTmpDir="",
     # transformation_ctx="OracleSQLtable_node1",
@@ -66,26 +66,25 @@ today = datetime.now(LOCAL_TZ)
 print("Today:", today)
 
 print("CR5505: Trying to connect to DB")
-#secret_str = """{ "host":"vots-int-rds-19c.cz89abdku6n8.ap-southeast-2.rds.amazonaws.com", "username":"vots_owner", "password":"votsOwner#Int", "engine":"oracle", "port":"1521", db_name="VOTSINT"}"""
-con = wr.oracle.connect(connection="test-cr5505-vots-db")
-#con = wr.oracle.connect(secret_id="""{ "host":"vots-int-rds-19c.cz89abdku6n8.ap-southeast-2.rds.amazonaws.com", "username":"vots_owner", "password":"votsOwner#Int", "engine":"oracle", "port":"1521", db_name="VOTSINT"}""")
+con = wr.oracle.connect(connection="test-cr5505-app-db")
+
 print("CR5505: Trying to RUN SQL query")
 df = wr.oracle.read_sql_query(
-    sql="select * from VTDLG_WORK_QUEUE where dlng_no in ('AS619290K')",
+    sql="select * from MYTABLE where dlng_no in ('AS619290K')",
     con=con
 )
 
 df1 = wr.oracle.read_sql_query(
-    sql="select * from VTDLG_WORK_QUEUE where dlng_no in ('AS619290K')",
+    sql="select * from MYTABLE where dlng_no in ('AS619290K')",
     con=con
 )
 
 #df.merge(df1, how='outer')
 df2 = pd.concat([df, df1])
 
-fileName = "vots_dealings_" + datetime.strftime(today, DT_FORMAT) + ".csv"
-#path1 = f"s3://vots-int-build-packages/Misc/cr5505/testfile1.csv"
-path1 = f"s3://vots-int-build-packages/Misc/cr5505/{fileName}"
+fileName = "app_dealings_" + datetime.strftime(today, DT_FORMAT) + ".csv"
+#path1 = f"s3://app-int-build-packages/Misc/cr5505/testfile1.csv"
+path1 = f"s3://app-int-build-packages/Misc/cr5505/{fileName}"
 
 print("CR5505: Trying to write CSV")
 wr.s3.to_csv(df2, path1, index=False)

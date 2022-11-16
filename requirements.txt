@@ -1,0 +1,6 @@
+awswrangler==2.17.0
+boto3==1.26.5
+botocore==1.29.5
+oracledb==1.1.1
+pandas==1.3.2
+Jinja2==3.0.3
